@@ -365,7 +365,8 @@ export default defineCommand({
     // Install project dependencies and initialize git
     // or skip installation based on the '--no-install' flag
     // citty v0.2.0 with node:util.parseArgs returns 'false' string for --install=false
-    if (ctx.args.install === false || (ctx.args.install as unknown) === 'false') {
+    const skipInstall = ctx.args.install === false || (ctx.args.install as unknown) === 'false'
+    if (skipInstall) {
       logger.info('Skipping install dependencies step.')
     }
     else {
@@ -494,7 +495,7 @@ export default defineCommand({
       const args: string[] = [
         ...modulesToAdd,
         `--cwd=${templateDownloadPath}`,
-        ctx.args.install ? '' : '--skipInstall',
+        skipInstall ? '--skipInstall' : '',
         ctx.args.logLevel ? `--logLevel=${ctx.args.logLevel}` : '',
       ].filter(Boolean)
 

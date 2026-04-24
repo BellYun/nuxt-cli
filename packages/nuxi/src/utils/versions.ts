@@ -6,11 +6,14 @@ import { coerce } from 'semver'
 import { tryResolveNuxt } from './kit'
 
 export async function getNuxtVersion(cwd: string, cache = true) {
-  const nuxtPkg = await readPackageJSON('nuxt', { url: cwd, try: true, cache })
-  if (nuxtPkg) {
-    return nuxtPkg.version!
+  const nuxtPath = resolveModulePath('nuxt/package.json', { from: cwd, try: true })
+  if (nuxtPath) {
+    const nuxtPkg = await readPackageJSON(nuxtPath, { cache }).catch(() => null)
+    if (nuxtPkg?.version) {
+      return nuxtPkg.version
+    }
   }
-  const pkg = await readPackageJSON(cwd)
+  const pkg = await readPackageJSON(cwd).catch(() => null)
   const pkgDep = pkg?.dependencies?.nuxt || pkg?.devDependencies?.nuxt
   return (pkgDep && coerce(pkgDep)?.version) || '3.0.0'
 }
